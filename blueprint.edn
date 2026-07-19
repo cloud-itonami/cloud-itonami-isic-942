@@ -1,0 +1,12 @@
+[{:itonami.blueprint/id "cloud-itonami-isic-942"
+  :itonami.blueprint/name "Activities of Trade Unions - Administrative Coordination"
+  :itonami.blueprint/isic-rev4 "942"
+  :itonami.blueprint/domain :services/trade-union-coordination
+  :itonami.blueprint/license "AGPL-3.0-or-later"
+  :itonami.blueprint/social-impact [:worker-representation-support :administrative-transparency :operational-efficiency :member-services-access]
+  :itonami.blueprint/governor :trade-union-governor
+  :itonami.blueprint/robotics false
+  :itonami.blueprint/required-technologies [:identity :forms :dmn :bpmn :audit-ledger]
+  :itonami.blueprint/status :public-oss
+  :itonami.blueprint/maturity :implemented
+  :db/id -1}]
