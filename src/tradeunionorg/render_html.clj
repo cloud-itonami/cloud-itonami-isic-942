@@ -237,6 +237,55 @@
      :commit-count (count approvals)
      :ledger-count (count ledger)}))
 
+(def ^:private probe-approver-key
+  "The approver-identity key the write-path probe supplies. Chosen from
+  `approver-key-candidates` so a fix that starts recording it is detected
+  by BOTH the probe and the scan of real committed records."
+  :approver)
+
+(defn- write-path-probe
+  "MEASURES *where* approver attribution is lost, instead of leaving the
+  empty approver column ambiguous.
+
+  An absent approver has two very different readings -- 'nobody approved
+  it' versus 'someone approved it and the write path silently discarded
+  them' -- and the scan above cannot tell them apart, because nothing in
+  this stack supplies an approver in the first place. So we supply one and
+  watch what happens to it, in two independent probes:
+
+  1. STORE layer: hand `store/append-ledger` a record that already carries
+     the key, and see whether the record it stores still has it.
+  2. COMMIT layer: put the key on a proposal and run the REAL
+     `operation/flow`, then read the record `operation/commit` actually
+     wrote.
+
+  Both run against their own throwaway `demo-store`, so the ledger
+  rendered on this page is untouched. Every branch of the note is derived
+  from these two booleans, so if either layer is ever changed the page
+  re-describes itself without anyone editing this namespace."
+  []
+  (let [;; probe 1 -- the store on its own
+        s1        (store/demo-store)
+        _         (store/append-ledger s1 {:operation :probe
+                                           :status :APPROVE
+                                           probe-approver-key "probe-identity"})
+        store-rec (first @(:ledger s1))
+
+        ;; probe 2 -- the real flow, approver supplied on the proposal
+        s2       (store/demo-store)
+        proposal {:operation :schedule-member-meeting
+                  :effect :propose
+                  :member-id "M001"
+                  :event-id "E001"
+                  probe-approver-key "probe-identity"
+                  :reason "Book Union Hall for the monthly general assembly"}
+        result   (operation/flow s2 advisor/enrich-proposal governor/govern proposal)
+        flow-rec (first @(:ledger s2))]
+    {:store-retains?  (contains? store-rec probe-approver-key)
+     :commit-retains? (boolean (and flow-rec (contains? flow-rec probe-approver-key)))
+     :flow-status     (:status result)
+     :flow-rec-keys   (into (sorted-set) (keys flow-rec))}))
+
 (defn- ledger-coverage
   "MEASURES which dispositions actually reach the store's append-only
   ledger. `operation/commit` is only called on the APPROVE branch, so the
@@ -430,6 +479,7 @@
                           (map #(kw (:check/id %))
                                (mapcat :reported-violations holds)))
         attribution (attribution-audit ledger runs)
+        probe       (write-path-probe)
         coverage    (ledger-coverage ledger runs)
         dropped     (dropped-violation-runs runs)
         ungoverned  (never-governed-runs runs)
@@ -571,6 +621,51 @@
                     (format " (results carry %s)"
                             (str/join ", " (map #(str "<code>" (esc (kw %)) "</code>") approver-in-results)))
                     "")))
+        "\n    </div>\n"))
+
+     ;; where attribution is lost -- probed, not assumed
+     (let [{:keys [store-retains? commit-retains? flow-status flow-rec-keys]} probe
+           k (str "<code>" (esc (kw probe-approver-key)) "</code>")]
+       (str
+        "    <div class=\"note\">\n"
+        "      <b>Which layer drops the approver.</b> "
+        (format (str "&quot;No approver&quot; above could mean nobody approved, or it could mean "
+                     "someone did and the write path discarded them. The scan alone cannot tell "
+                     "those apart, because nothing in this stack supplies an approver to begin with. "
+                     "So this renderer supplies one: it puts %s on a proposal and on a raw ledger "
+                     "record, runs both through the real code against throwaway stores, and reports "
+                     "what survived. ")
+                k)
+        (cond
+          (and store-retains? (not commit-retains?))
+          (format (str "<b>The store is not the culprit.</b> Handed a record that already carried %s, "
+                       "<code>MemStore/append-ledger</code> stored it unchanged &mdash; it keeps whatever "
+                       "it is given and destructures nothing. But putting %s on a proposal and running "
+                       "the real flow (which returned <code>%s</code>) produced a ledger record whose "
+                       "complete key set is %s: the approver is gone. "
+                       "<code>tradeunionorg.operation/commit</code> does not forward the decision or the "
+                       "proposal &mdash; it builds a fresh four-key record from scratch, so every field "
+                       "not named in it is dropped at that line. That matters for anyone fixing this: "
+                       "adding a human-approval step upstream would <em>not</em> put an approver in the "
+                       "ledger on its own, because <code>commit</code> would still discard it.")
+                  k k (esc (kw flow-status))
+                  (str/join ", " (map #(str "<code>" (esc (kw %)) "</code>") flow-rec-keys)))
+
+          commit-retains?
+          (format (str "%s supplied on a proposal now reaches the ledger (record keys: %s), so a "
+                       "committed row can name its approver once an approval step actually produces one. "
+                       "This paragraph rewrote itself when that became true.")
+                  k (str/join ", " (map #(str "<code>" (esc (kw %)) "</code>") flow-rec-keys)))
+
+          (not store-retains?)
+          (format (str "<b>The store itself drops it.</b> Handed a record that explicitly carried %s, "
+                       "<code>MemStore/append-ledger</code> stored a record without it. Attribution "
+                       "cannot be recorded at all until the store stops projecting away keys it is given.")
+                  k)
+
+          :else
+          (format "Probe inconclusive: store retained %s, flow returned <code>%s</code>."
+                  k (esc (kw flow-status))))
         "\n    </div>\n"))
 
      ;; ledger coverage
