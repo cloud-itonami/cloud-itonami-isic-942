@@ -46,10 +46,18 @@
   "The scenario driven through the real stack, in order.
 
   `:label` is narration; every other cell on the page comes from running
-  `:proposal` through `tradeunionorg.operation/flow`. Member/event/account
-  ids are the ones actually seeded by `tradeunionorg.store/demo-store`
-  (M001/M002/M003, E001/E002, A001/A002/A003) -- except `M999`, which is
-  deliberately absent so the store-lookup arm of HARD check #1 can fire.
+  `:proposal` through `tradeunionorg.operation/flow`. EVERY id on the page
+  is one actually seeded by `tradeunionorg.store/demo-store` -- members
+  M001/M002/M003, events E001/E002, accounts A001/A002/A003. No id is
+  invented, including the ones used to make a check fail.
+
+  The store-lookup arm of HARD check #1 (\"Member not found in store\") is
+  fired WITHOUT inventing a missing id: the proposal puts the real account
+  id `A001` in the `:member-id` slot. `A001` exists in the store's accounts
+  map (it is M001's staff account) but is not a key in its members map, so
+  `store/member` returns nil. That is also the realistic operator error --
+  pasting an account id into a member field -- rather than a fictional
+  member number that could never appear in a real submission.
 
   Covers: a five-step happy-path lifecycle that commits, six HARD governor
   holds spanning all three checks (including one proposal that trips all
@@ -98,13 +106,13 @@
                :member-id "M003"
                :event-id "E002"
                :reason "Book the Training Room for new-member onboarding"}}
-   {:label "Booking for a member id that is not in the directory"
+   {:label "Booking whose member field was filled with an account id (A001)"
     :group :hold
     :proposal {:operation :schedule-member-meeting
                :effect :propose
-               :member-id "M999"
+               :member-id "A001"
                :event-id "E001"
-               :reason "Book Union Hall for an unknown member"}}
+               :reason "Book Union Hall for the monthly general assembly"}}
    {:label "Proposal that tries to act rather than propose"
     :group :hold
     :proposal {:operation :schedule-member-meeting
@@ -242,13 +250,31 @@
      :ledger-count (count ledger)}))
 
 (defn- dropped-violation-runs
-  "MEASURES runs where the governor found violations that the decision did
-  not carry forward. `operation/decide` tests `:flag-safety-concern`
-  BEFORE it tests `passes?`, so a safety concern from an unverified member
-  escalates with the violation discarded."
+  "MEASURES runs where the real flow DID reach the governor, the governor
+  found violations, and the decision did not carry them forward.
+  `operation/decide` tests `:flag-safety-concern` BEFORE it tests
+  `passes?`, so a safety concern from an unverified member escalates with
+  the violation discarded.
+
+  `:intake-rejected` runs are excluded on purpose: for those,
+  `operation/flow` returned at `intake` and never called the governor or
+  `decide` at all, so nothing was 'dropped by decide'. Counting them here
+  would overstate this defect -- they are reported separately by
+  `never-governed-runs`."
   [runs]
-  (filterv #(and (seq (:governor-violations %))
+  (filterv #(and (not= :intake-rejected (:fact %))
+                 (seq (:governor-violations %))
                  (empty? (:reported-violations %)))
+           runs))
+
+(defn- never-governed-runs
+  "MEASURES runs the real flow rejected at `intake`, before the governor
+  ran. Any violations shown for these rows come from this renderer's own
+  independent `governor/govern` probe, NOT from the flow -- so they are
+  labelled as such rather than presented as findings the actor made."
+  [runs]
+  (filterv #(and (= :intake-rejected (:fact %))
+                 (seq (:governor-violations %)))
            runs))
 
 ;; ----------------------------- rendering -----------------------------
@@ -320,7 +346,12 @@
                                   governor-violations))
                (when (and (seq governor-violations)
                           (empty? reported-violations))
-                 "<br><span class=\"warn\">found by governor, dropped by decide</span>"))))
+                 (if (= :intake-rejected fact)
+                   ;; flow returned at intake -- the governor and decide
+                   ;; never ran. Shown only because this renderer probed
+                   ;; the governor separately; do not claim decide dropped it.
+                   "<br><span class=\"muted\">governor never ran &mdash; rejected at intake; shown from a separate probe</span>"
+                   "<br><span class=\"warn\">found by governor, dropped by decide</span>")))))
 
 (defn- ledger-row [{:keys [operation status member-id]}]
   (format "        <tr><td>%s</td><td>%s</td><td>%s</td></tr>"
@@ -401,6 +432,7 @@
         attribution (attribution-audit ledger runs)
         coverage    (ledger-coverage ledger runs)
         dropped     (dropped-violation-runs runs)
+        ungoverned  (never-governed-runs runs)
         commits     (filterv #(= :committed (:fact %)) runs)
         escalations (filterv #(= :escalated (:fact %)) runs)]
     (str
@@ -566,12 +598,15 @@
        (str
         "    <div class=\"note\">\n"
         "      <b>Some governor findings never reach the decision.</b> "
-        (format (str "In %s of the %s scenarios the governor returned violations that the decision did not "
-                     "carry forward. <code>tradeunionorg.operation/decide</code> tests for "
+        (format (str "In %s of the %s scenarios the flow reached the governor, the governor returned "
+                     "violations, and the decision did not carry them forward. "
+                     "<code>tradeunionorg.operation/decide</code> tests for "
                      "<code>:flag-safety-concern</code> <em>before</em> it tests <code>:passes?</code>, so a "
                      "safety report escalates even when the member who filed it fails HARD check #1. "
                      "Escalating a safety report regardless of the reporter's standing is defensible; "
-                     "silently discarding the finding is the part worth knowing. Affected: %s.")
+                     "silently discarding the finding is the part worth knowing &mdash; the escalation "
+                     "handed to the human reviewer carries no <code>:violations</code> key at all, so "
+                     "nothing tells the reviewer that the reporter failed verification. Affected: %s.")
                 (count dropped) (count runs)
                 (str/join "; " (map (fn [d]
                                       (format "%s (%s)"
@@ -579,6 +614,23 @@
                                               (str/join ", " (map #(str "<code>" (esc (kw (:check/id %))) "</code>")
                                                                   (:governor-violations d)))))
                                     dropped)))
+        "\n    </div>\n")
+       "")
+
+     ;; rejected before the governor ever ran
+     (if (seq ungoverned)
+       (str
+        "    <div class=\"note\">\n"
+        "      <b>Malformed proposals are refused before the governor is consulted.</b> "
+        (format (str "%s scenario(s) were rejected by <code>tradeunionorg.operation/intake</code>, which "
+                     "returns an <code>:ERROR</code> that makes <code>flow</code> return immediately &mdash; "
+                     "the governor and <code>decide</code> never ran for them. The violations shown in "
+                     "their row come from a <em>separate</em> <code>governor/govern</code> call this "
+                     "renderer makes for comparison, and are labelled in the table as such. They are NOT "
+                     "counted as HARD holds anywhere on this page, because the actor never made that "
+                     "finding. Affected: %s.")
+                (count ungoverned)
+                (str/join "; " (map #(esc (:label %)) ungoverned)))
         "\n    </div>\n")
        "")
      "  </section>\n"
