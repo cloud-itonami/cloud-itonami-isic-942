@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>cloud-itonami-isic-942 &middot; trade union administrative coordination</title>
+<style>
+:root{--ink:#1a1a1c;--dim:#5b5b63;--line:#d8d8de;--bg:#f5f5f7;--card:#fff;
+--ok:#0b6b3a;--warn:#8a5300;--crit:#a4123f;--ok-bg:#e8f5ee;--warn-bg:#fdf3e2;--crit-bg:#fdecf1;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font:15px/1.65 -apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif}
+.bar{background:#12243d;color:#fff;padding:20px 28px}
+.bar h1{margin:0 0 6px;font-size:19px;font-weight:650;letter-spacing:.01em}
+.badge{display:inline-block;font-size:12.5px;color:#c3d2e6}
+main{max-width:1180px;margin:0 auto;padding:24px 20px 64px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+padding:20px 22px;margin:0 0 20px}
+.card h2{margin:0 0 4px;font-size:16px;font-weight:650}
+.muted{color:var(--dim)}
+p.muted{margin:0 0 14px;font-size:13.5px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:640;font-size:12.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
+tbody tr:last-child td{border-bottom:none}
+code{font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
+background:#f0f0f4;border-radius:4px;padding:1px 5px}
+.ok,.warn,.critical{display:inline-block;border-radius:4px;padding:1px 7px;
+font-size:12.5px;font-weight:600;white-space:nowrap}
+.ok{color:var(--ok);background:var(--ok-bg)}
+.warn{color:var(--warn);background:var(--warn-bg)}
+.critical{color:var(--crit);background:var(--crit-bg)}
+.note{border-left:3px solid var(--warn);background:var(--warn-bg);
+padding:12px 16px;border-radius:0 6px 6px 0;margin:0 0 12px;font-size:13.5px}
+.note b{font-weight:650}
+.note code{background:#fff}
+</style></head><body>
+<header class="bar">
+  <h1>Activities of trade unions (ISIC 942) &mdash; Operator Console</h1>
+  <span class="badge">read-only build-time sample &middot; governor-gated &middot; every operation is propose-only &middot; bargaining, grievances, strikes, officer decisions and discipline are permanently out of scope</span>
+</header>
+<main>
+  <section class="card">
+    <h2>What this page is</h2>
+    <p class="muted">Generated at build time by <code>tradeunionorg.render-html</code> (<code>clojure -M:render-html</code>). It drives this repo's real stack &mdash; <code>tradeunionorg.operation/flow</code> &rarr; <code>tradeunionorg.advisor</code> &rarr; <code>tradeunionorg.governor</code> &rarr; <code>tradeunionorg.store</code> &mdash; over one shared <code>store/demo-store</code> and reports what came back. No figure below is hand-written.</p>
+    <table>
+      <thead><tr><th>Measure</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Scenarios driven through the real flow</td><td>14</td></tr>
+        <tr><td>Committed (governor passed)</td><td>5</td></tr>
+        <tr><td>HARD governor holds</td><td><span class="critical">6</span></td></tr>
+        <tr><td>Distinct hold rules exercised</td><td><code>effect-not-propose</code>, <code>member-unverified</code>, <code>scope-exclusion</code></td></tr>
+        <tr><td>Escalated to human review</td><td>2</td></tr>
+        <tr><td>Records in the store's append-only ledger</td><td>5</td></tr>
+        <tr><td>Wall-clock values rendered</td><td>0 &mdash; the page is byte-identical across reruns</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>Member directory</h2>
+    <p class="muted">Read from <code>tradeunionorg.store/demo-store</code>. HARD check #1 re-derives <code>:registered?</code> and <code>:verified?</code> from these records on every single proposal &mdash; a proposal cannot assert its own member's standing.</p>
+    <table>
+      <thead><tr><th>Member</th><th>Name</th><th>Role</th><th>Registration</th><th>Verification</th></tr></thead>
+      <tbody>
+        <tr><td><code>M001</code></td><td>Alice Tanaka</td><td>Shop Steward</td><td><span class="ok">registered</span></td><td><span class="ok">verified</span></td></tr>
+        <tr><td><code>M002</code></td><td>Bob Suzuki</td><td>Member</td><td><span class="ok">registered</span></td><td><span class="ok">verified</span></td></tr>
+        <tr><td><code>M003</code></td><td>Carol Yamamoto</td><td>Member</td><td><span class="critical">not registered</span></td><td><span class="critical">not verified</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>Scheduled events</h2>
+    <p class="muted">Union-local logistics only: meetings, training and social events. Read from the same seeded store.</p>
+    <table>
+      <thead><tr><th>Event</th><th>Name</th><th>Date</th><th>Location</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td><code>E001</code></td><td>Monthly General Assembly</td><td>2026-08-15</td><td>Union Hall</td><td>meeting</td></tr>
+        <tr><td><code>E002</code></td><td>New Member Training</td><td>2026-08-20</td><td>Training Room</td><td>training</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>Staff &amp; volunteer accounts</h2>
+    <p class="muted">Shift-assignment accounts, each bound to a member id in the directory above.</p>
+    <table>
+      <thead><tr><th>Account</th><th>Member</th><th>Role</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><code>A001</code></td><td><code>M001</code></td><td>staff</td><td><span class="ok">active</span></td></tr>
+        <tr><td><code>A002</code></td><td><code>M002</code></td><td>volunteer</td><td><span class="ok">active</span></td></tr>
+        <tr><td><code>A003</code></td><td><code>M003</code></td><td>volunteer</td><td><span class="warn">pending</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>Action gate (Union Governor)</h2>
+    <p class="muted">Three HARD, permanent, un-overridable checks. There is no override path in the code: a violation is a refusal, not a request for approval. The description column documents the fixed contract in <code>tradeunionorg.governor</code>; the right-hand column is counted from this run.</p>
+    <table>
+      <thead><tr><th>Check</th><th>Contract</th><th>This run</th></tr></thead>
+      <tbody>
+        <tr><td><code>member-unverified</code></td><td>Member must exist in the store AND be independently :registered? and :verified?. Re-derived from the member record on every proposal, never trusted from the proposal itself.</td><td><span class="critical">fired 4&times; in this run</span></td></tr>
+        <tr><td><code>effect-not-propose</code></td><td>Effect must be :propose. Every operation in the closed allowlist is propose-only; any other effect is refused outright.</td><td><span class="critical">fired 3&times; in this run</span></td></tr>
+        <tr><td><code>scope-exclusion</code></td><td>Permanently blocks collective bargaining, grievance adjudication, strike authorisation, union-leadership/officer decisions and disciplinary action (EN + JA patterns). Only :flag-safety-concern is exempt.</td><td><span class="critical">fired 3&times; in this run</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>Scenario run (this build)</h2>
+    <p class="muted">Every row is one call to <code>tradeunionorg.operation/flow</code>: intake &rarr; advise &rarr; govern &rarr; decide &rarr; commit / hold / escalate. Confidence is the advisor's real score for that operation.</p>
+    <table>
+      <thead><tr><th>Scenario</th><th>Operation</th><th>Effect</th><th>Member</th><th>Disposition</th><th>Conf.</th><th>Governor violations</th></tr></thead>
+      <tbody>
+        <tr><td>Schedule the monthly general assembly (E001)</td><td><code>schedule-member-meeting</code></td><td><code>propose</code></td><td><code>M001</code></td><td><span class="ok">committed</span></td><td>0.92</td><td><span class="muted">none</span></td></tr>
+        <tr><td>Coordinate dues-processing logistics</td><td><code>coordinate-dues-processing-logistics</code></td><td><code>propose</code></td><td><code>M001</code></td><td><span class="ok">committed</span></td><td>0.88</td><td><span class="muted">none</span></td></tr>
+        <tr><td>Request office consumables for the hall</td><td><code>coordinate-supply-request</code></td><td><code>propose</code></td><td><code>M001</code></td><td><span class="ok">committed</span></td><td>0.85</td><td><span class="muted">none</span></td></tr>
+        <tr><td>Propose a volunteer shift for the training session</td><td><code>schedule-staff-shift-proposal</code></td><td><code>propose</code></td><td><code>M002</code></td><td><span class="ok">committed</span></td><td>0.80</td><td><span class="muted">none</span></td></tr>
+        <tr><td>Schedule the new-member training session (E002)</td><td><code>schedule-member-meeting</code></td><td><code>propose</code></td><td><code>M002</code></td><td><span class="ok">committed</span></td><td>0.92</td><td><span class="muted">none</span></td></tr>
+        <tr><td>Same booking, but for an unregistered member</td><td><code>schedule-member-meeting</code></td><td><code>propose</code></td><td><code>M003</code></td><td><span class="critical">HARD hold</span></td><td>0.92</td><td><code>member-unverified</code> &middot; Member is not registered</td></tr>
+        <tr><td>Booking whose member field was filled with an account id (A001)</td><td><code>schedule-member-meeting</code></td><td><code>propose</code></td><td><code>A001</code></td><td><span class="critical">HARD hold</span></td><td>0.92</td><td><code>member-unverified</code> &middot; Member not found in store</td></tr>
+        <tr><td>Proposal that tries to act rather than propose</td><td><code>schedule-member-meeting</code></td><td><code>approve</code></td><td><code>M001</code></td><td><span class="critical">HARD hold</span></td><td>0.92</td><td><code>effect-not-propose</code> &middot; Effect is :approve, not :propose</td></tr>
+        <tr><td>Meeting agenda that reaches into collective bargaining</td><td><code>schedule-member-meeting</code></td><td><code>propose</code></td><td><code>M001</code></td><td><span class="critical">HARD hold</span></td><td>0.92</td><td><code>scope-exclusion</code> &middot; Proposal touches collective-bargaining, grievance-adjudication, strike-authorization, union-leadership/officer decisions, or disciplinary action</td></tr>
+        <tr><td>Meeting agenda that reaches into union-officer decisions (JA)</td><td><code>schedule-member-meeting</code></td><td><code>propose</code></td><td><code>M001</code></td><td><span class="critical">HARD hold</span></td><td>0.92</td><td><code>scope-exclusion</code> &middot; Proposal touches collective-bargaining, grievance-adjudication, strike-authorization, union-leadership/officer decisions, or disciplinary action</td></tr>
+        <tr><td>Grievance adjudication, unverified member, acting effect</td><td><code>schedule-member-meeting</code></td><td><code>commit</code></td><td><code>M003</code></td><td><span class="critical">HARD hold</span></td><td>0.92</td><td><code>member-unverified</code> &middot; Member is not registered<br><code>effect-not-propose</code> &middot; Effect is :commit, not :propose<br><code>scope-exclusion</code> &middot; Proposal touches collective-bargaining, grievance-adjudication, strike-authorization, union-leadership/officer decisions, or disciplinary action</td></tr>
+        <tr><td>Member reports an unsafe facility</td><td><code>flag-safety-concern</code></td><td><code>propose</code></td><td><code>M001</code></td><td><span class="warn">escalated to human</span></td><td>0.95</td><td><span class="muted">none</span></td></tr>
+        <tr><td>Same safety report, filed by an unregistered member</td><td><code>flag-safety-concern</code></td><td><code>propose</code></td><td><code>M003</code></td><td><span class="warn">escalated to human</span></td><td>0.95</td><td><code>member-unverified</code> &middot; Member is not registered<br><span class="warn">found by governor, dropped by decide</span></td></tr>
+        <tr><td>Supply request submitted with no :effect field</td><td><code>coordinate-supply-request</code></td><td><code></code></td><td><code>M001</code></td><td><span class="muted">rejected at intake</span><br><span class="muted">Missing :effect field</span></td><td>0.85</td><td><code>effect-not-propose</code> &middot; Effect is , not :propose<br><span class="muted">governor never ran &mdash; rejected at intake; shown from a separate probe</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>Store audit ledger (this run)</h2>
+    <p class="muted">The append-only ledger inside <code>tradeunionorg.store/MemStore</code>, exactly as <code>tradeunionorg.operation/commit</code> wrote it. Each record also carries a <code>:timestamp</code> (<code>java.util.Date</code>); it is omitted here on purpose so this page stays byte-identical across builds.</p>
+    <table>
+      <thead><tr><th>Operation</th><th>Status</th><th>Member</th></tr></thead>
+      <tbody>
+        <tr><td><code>schedule-member-meeting</code></td><td><code>APPROVE</code></td><td><code>M001</code></td></tr>
+        <tr><td><code>coordinate-dues-processing-logistics</code></td><td><code>APPROVE</code></td><td><code>M001</code></td></tr>
+        <tr><td><code>coordinate-supply-request</code></td><td><code>APPROVE</code></td><td><code>M001</code></td></tr>
+        <tr><td><code>schedule-staff-shift-proposal</code></td><td><code>APPROVE</code></td><td><code>M002</code></td></tr>
+        <tr><td><code>schedule-member-meeting</code></td><td><code>APPROVE</code></td><td><code>M002</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>What this store can and cannot tell you</h2>
+    <p class="muted">Measured at render time by scanning the real records this run produced &mdash; not asserted in the source. If the store is ever changed, these paragraphs change with it.</p>
+    <div class="note">
+      <b>Approver attribution.</b> Scanned all 5 committed record(s); their complete key set is <code>member-id</code>, <code>operation</code>, <code>status</code>, <code>timestamp</code>. None of the 17 approver-identity keys this renderer looks for is present, and none is present on the decision results either. This is not the store dropping an approver it was given: <code>tradeunionorg.operation/decide</code> returns <code>:APPROVE</code> / <code>:HOLD</code> / <code>:ESCALATE</code> and there is no human-approval step anywhere in this stack that would produce an identity to record. So the honest reading of a committed row below is &quot;the governor passed it and the actor committed it&quot;, <em>not</em> &quot;a named person approved it&quot;. Escalated rows say a human must review, but nothing records who did.
+    </div>
+    <div class="note">
+      <b>Which layer drops the approver.</b> &quot;No approver&quot; above could mean nobody approved, or it could mean someone did and the write path discarded them. The scan alone cannot tell those apart, because nothing in this stack supplies an approver to begin with. So this renderer supplies one: it puts <code>approver</code> on a proposal and on a raw ledger record, runs both through the real code against throwaway stores, and reports what survived. <b>The store is not the culprit.</b> Handed a record that already carried <code>approver</code>, <code>MemStore/append-ledger</code> stored it unchanged &mdash; it keeps whatever it is given and destructures nothing. But putting <code>approver</code> on a proposal and running the real flow (which returned <code>APPROVE</code>) produced a ledger record whose complete key set is <code>member-id</code>, <code>operation</code>, <code>status</code>, <code>timestamp</code>: the approver is gone. <code>tradeunionorg.operation/commit</code> does not forward the decision or the proposal &mdash; it builds a fresh four-key record from scratch, so every field not named in it is dropped at that line. That matters for anyone fixing this: adding a human-approval step upstream would <em>not</em> put an approver in the ledger on its own, because <code>commit</code> would still discard it.
+    </div>
+    <div class="note">
+      <b>The ledger only records what succeeded.</b> This run produced 14 dispositions (<code>committed</code> 5, <code>escalated</code> 2, <code>governor-hold</code> 6, <code>intake-rejected</code> 1), but the append-only ledger holds 5 record(s) (<code>APPROVE</code> 5). <code>tradeunionorg.operation/flow</code> calls <code>commit</code> only on the <code>:APPROVE</code> branch, so every HARD hold and every escalation above leaves <em>no trace in the store at all</em>. The refusals on this page exist because the renderer captured the return values; an operator reading the ledger alone could not reconstruct them. Recording refusals is a governance change with its own contract, so it is disclosed here rather than patched by this renderer.
+    </div>
+    <div class="note">
+      <b>Some governor findings never reach the decision.</b> In 1 of the 14 scenarios the flow reached the governor, the governor returned violations, and the decision did not carry them forward. <code>tradeunionorg.operation/decide</code> tests for <code>:flag-safety-concern</code> <em>before</em> it tests <code>:passes?</code>, so a safety report escalates even when the member who filed it fails HARD check #1. Escalating a safety report regardless of the reporter's standing is defensible; silently discarding the finding is the part worth knowing &mdash; the escalation handed to the human reviewer carries no <code>:violations</code> key at all, so nothing tells the reviewer that the reporter failed verification. Affected: Same safety report, filed by an unregistered member (<code>member-unverified</code>).
+    </div>
+    <div class="note">
+      <b>Malformed proposals are refused before the governor is consulted.</b> 1 scenario(s) were rejected by <code>tradeunionorg.operation/intake</code>, which returns an <code>:ERROR</code> that makes <code>flow</code> return immediately &mdash; the governor and <code>decide</code> never ran for them. The violations shown in their row come from a <em>separate</em> <code>governor/govern</code> call this renderer makes for comparison, and are labelled in the table as such. They are NOT counted as HARD holds anywhere on this page, because the actor never made that finding. Affected: Supply request submitted with no :effect field.
+    </div>
+  </section>
+</main>
+</body></html>
