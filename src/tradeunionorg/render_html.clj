@@ -34,7 +34,7 @@
 
   Usage: `clojure -M:render-html [out-file]`
   (default `docs/samples/operator-console.html`)."
-  (:require [clojure.string :as str]
+  (:require [kotoba.lang.text :as str]
             [tradeunionorg.store :as store]
             [tradeunionorg.advisor :as advisor]
             [tradeunionorg.governor :as governor]
