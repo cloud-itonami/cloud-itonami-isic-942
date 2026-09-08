@@ -12,7 +12,7 @@
      grievance-adjudication, strike-authorization, union-leadership/officer
      decisions, or disciplinary action is permanently blocked."
   (:require [tradeunionorg.store :as store]
-            [clojure.string :as str]))
+            [kotoba.lang.text :as str]))
 
 ;; ---------------------- hard checks ----------------------
 
