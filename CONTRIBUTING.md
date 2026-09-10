@@ -10,7 +10,7 @@
 
 1. Branch from `main`.
 2. Add test cases for new behavior.
-3. Ensure all 20 tests pass via `nbb test_runner.cljs`.
+3. Ensure all 20 tests pass via `nbb test_runner.kotoba`.
 4. Keep scope strictly within administrative coordination.
 
 ## Scope Boundaries (Non-Negotiable)
