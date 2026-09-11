@@ -32,7 +32,7 @@
   the HARD-hold requirement is enforced by the build rather than by
   convention.
 
-  Usage: `clojure -M:render-html [out-file]`
+  Usage: `kbb -M:render-html [out-file]`
   (default `docs/samples/operator-console.html`)."
   (:require [kotoba.lang.text :as str]
             [tradeunionorg.store :as store]
@@ -500,7 +500,7 @@
      ;; ---------------- provenance ----------------
      "  <section class=\"card\">\n"
      "    <h2>What this page is</h2>\n"
-     "    <p class=\"muted\">Generated at build time by <code>tradeunionorg.render-html</code> (<code>clojure -M:render-html</code>). It drives this repo's real stack &mdash; <code>tradeunionorg.operation/flow</code> &rarr; <code>tradeunionorg.advisor</code> &rarr; <code>tradeunionorg.governor</code> &rarr; <code>tradeunionorg.store</code> &mdash; over one shared <code>store/demo-store</code> and reports what came back. No figure below is hand-written.</p>\n"
+     "    <p class=\"muted\">Generated at build time by <code>tradeunionorg.render-html</code> (<code>kbb -M:render-html</code>). It drives this repo's real stack &mdash; <code>tradeunionorg.operation/flow</code> &rarr; <code>tradeunionorg.advisor</code> &rarr; <code>tradeunionorg.governor</code> &rarr; <code>tradeunionorg.store</code> &mdash; over one shared <code>store/demo-store</code> and reports what came back. No figure below is hand-written.</p>\n"
      "    <table>\n"
      "      <thead><tr><th>Measure</th><th>Value</th></tr></thead>\n"
      "      <tbody>\n"
