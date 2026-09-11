@@ -15,7 +15,7 @@
          :main-opts    ["-m" "clj-kondo.main"
                         "--lint" "src" "test"
                         "--fail-level" "error"]}
-  ;; clojure -M:render-html [out-file]
+  ;; kbb -M:render-html [out-file]
   ;;   -> regenerate docs/samples/operator-console.html by driving the REAL
   ;;      stack (operation/flow -> advisor -> governor -> store). Refuses to
   ;;      write a page from a run with zero :governor-hold facts.

@@ -11,7 +11,7 @@ ISIC 942 (Activities of trade unions) actor for the cloud-itonami fleet. Governs
 nbb test_runner.kotoba
 
 # Demo scenarios
-nbb -e "(require 'tradeunionorg.sim) (pprint (tradeunionorg.sim/run-scenarios))"
+kbb --backend sci -e "(require 'tradeunionorg.sim) (pprint (tradeunionorg.sim/run-scenarios))"
 ```
 
 ## Architecture
